@@ -1,7 +1,7 @@
 import express from 'express';
 import prisma from './config/database.js';
-import { createUserSchema,updateUserSchema } from './validations/user.schema.js';
-import { error } from 'node:console';
+import { createUserSchema, updateUserSchema } from './validations/user.schema.js';
+import { createTaskSchema } from './validations/task.schema.js';
 
 const app = express();
 const PORT = 3000;
@@ -141,6 +141,46 @@ app.put('/users/:id', async (req, res) => {
   } catch (error) {
     console.error('[DB_ERROR] Error updating user:', error);
     res.status(400).json({ status: 'error', message: 'Error updating user. Verify the ID and data.' });
+  }
+});
+
+// --- TASKS ROUTES ---
+
+app.post('/tasks', async (req, res) => {
+  const validation = createTaskSchema.safeParse(req.body);
+
+  if(!validation.success) {
+    return res.status(400).json({
+      status: 'error',
+      message: 'Invalid data. Please check the provided information.',
+      errors: validation.error.issues.map(issue => ({
+        field: issue.path,
+        message: issue.message
+      }))
+    });
+  }
+
+  try {
+    const userExists = await prisma.user.findUnique({
+      where: { id: validation.data.userId }
+    });
+
+    if (!userExists) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'User not found. Cannot create task for a non-existent user.',
+      });
+    }
+
+    const newTask = await prisma.task.create({
+      data: validation.data as any
+    });
+
+    res. status(201).json({ status: 'success', data: newTask });
+
+  } catch (error) {
+    console.error('[DB_ERROR] Error creating task:', error);
+    res.status(500).json({ status: 'error', message: 'Internal server error.' });
   }
 });
 
