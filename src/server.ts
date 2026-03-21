@@ -1,6 +1,7 @@
 import express from 'express';
 import prisma from './config/database.js';
-import { createUserSchema } from './validations/user.schema.js';
+import { createUserSchema,updateUserSchema } from './validations/user.schema.js';
+import { error } from 'node:console';
 
 const app = express();
 const PORT = 3000;
@@ -112,27 +113,34 @@ app.delete('/users/:id', async (req, res) => {
   }
 });
 
-// --- ROTA PARA ATUALIZAR USUÁRIO (PUT) ---
+// --- UPDATE ROUTES (PUT) ---
 
 app.put('/users/:id', async (req, res) => {
+  const validation = updateUserSchema.safeParse(req.body);
+
+  if (!validation.success) {
+    return res.status(400).json({
+      status: 'error',
+      message: 'Invalid data provided.',
+      errors: validation.error.issues.map(issue => ({
+        field: issue.path,
+        message: issue.message
+      }))
+    });
+  }
+
   try {
     const { id } = req.params;
-    const { name, email, password } = req.body;
+    
     const updateUser = await prisma.user.update({
-      where: {
-        id: id,
-      },
-      data: {
-        name,
-        email,
-        password,
-      },
+      where: { id: id },
+      data: validation.data as any,
     });
-    res.status(200).json({ stauts: 'success', data: updateUser });
-
+    
+    res.status(200).json({ status: 'success', data: updateUser });
   } catch (error) {
     console.error('[DB_ERROR] Error updating user:', error);
-    res.status(400).json({ status: 'error', message: 'Error updating user. Please check the provided data.' });
+    res.status(400).json({ status: 'error', message: 'Error updating user. Verify the ID and data.' });
   }
 });
 
