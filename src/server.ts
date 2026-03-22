@@ -1,7 +1,7 @@
 import express from 'express';
 import prisma from './config/database.js';
 import { createUserSchema, updateUserSchema } from './validations/user.schema.js';
-import { createTaskSchema } from './validations/task.schema.js';
+import { createTaskSchema, updateTaskSchema } from './validations/task.schema.js';
 
 const app = express();
 const PORT = 3000;
@@ -108,7 +108,6 @@ app.delete('/users/:id', async (req, res) => {
 
   } catch (error) {
     console.error('[DB_ERROR] Erro ao deletar  usuário:', error);
-    // Retornamos 400 (Bad Resquest) caso o ID não exista no banco
     res.status(400).json({ status: 'error', message: 'Error deleting user. Verify the provided ID.' });
   }
 });
@@ -181,6 +180,71 @@ app.post('/tasks', async (req, res) => {
   } catch (error) {
     console.error('[DB_ERROR] Error creating task:', error);
     res.status(500).json({ status: 'error', message: 'Internal server error.' });
+  }
+});
+
+app.get('/users/:userId/tasks', async (req, res) => {
+    try {
+      const { userId } = req.params
+
+      const userTasks = await prisma.task.findMany({
+        where: {
+          userId: userId
+        },
+
+        orderBy: {
+          createdAt: 'desc'
+        }
+      });
+
+      res.status(200).json({ status: 'success', data: userTasks});
+
+    } catch (error) {
+      console.error('[DB_ERROR] Error fetching user tasks:', error)
+      res.status(500).json({ status: 'error', message: 'Error fetching user tasks.'});
+    }
+});
+
+app.put('/tasks/:id', async (req, res) => {
+  const validation = updateTaskSchema.safeParse(req.body);
+
+  if (!validation.success) {
+    return res.status(400).json({
+      status: 'error',
+      message: 'Invalid data. Please check the provided information.',
+      errors: validation.error.issues.map(issue => ({
+        field: issue.path,
+        message: issue.message
+      }))
+    });
+  }
+
+  try {
+    const { id } = req.params;
+    
+    const updatedTask = await prisma.task.update({
+      where: { id: id },
+      data: validation.data as any,
+    });
+    
+    res.status(200).json({ status: 'success', data: updatedTask });
+  } catch (error) {
+    console.error('[DB_ERROR] Error updating task:', error);
+    res.status(400).json({ status: 'error', message: 'Error updating task. Verify the ID and data.' });
+  }
+});
+
+app.delete('/tasks/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    await prisma.task.delete({
+      where: { id: id },
+    });
+    res.status(200).json({ status: 'success', message: 'Task deleted successfully.'});
+
+  } catch (error) {
+    console.error('[DB_ERROR] Error deleting task:', error);
+    res.status(400).json({ status: 'error', message: 'Error deleting task. Verify the provided ID.' });
   }
 });
 
