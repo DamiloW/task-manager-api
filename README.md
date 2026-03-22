@@ -5,10 +5,19 @@ Uma API robusta para gerenciamento de tarefas, desenvolvida com foco em boas pr�
 ## Tecnologias Utilizadas
 
 - **Runtime:** [Node.js](https://nodejs.org/)
+- **Framework:** [Express](https://expressjs.com/)
 - **Linguagem:** [TypeScript](https://www.typescriptlang.org/)
 - **Banco de Dados:** [PostgreSQL](https://www.postgresql.org/)
 - **ORM:** [Prisma](https://www.prisma.io/)
+- **Validação:** [Zod](https://zod.dev/)
 - **Containerização:** [Docker](https://www.docker.com/)
+
+## Funcionalidades Implementadas
+
+- **Usuários:** CRUD completo com senhas seguras e relacionamentos.
+- **Tarefas:** CRUD completo vinculado ao ID do usuário dono da tarefa.
+- **Paginação:** Sistema de paginação e meta-dados na listagem de tarefas.
+- **Segurança:** Validação estrita de dados de entrada utilizando schemas do Zod.
 
 ## Arquitetura do Projeto
 
@@ -40,9 +49,10 @@ A aplicação utiliza Docker para isolar o banco de dados e o Prisma como ponte 
     npm run dev
 
 Próximos Passos (Roadmap)
-[ ] Implementação de autenticação JWT.
-[ ] CRUD completo de usuários.
-[ ] Sistema de categorias para tarefas.
+[x] CRUD completo de usuários.
+[x] CRUD completo de tarefas com paginação.
+[ ] Implementação de Testes Automatizados com Jest.
 [ ] Documentação da API com Swagger.
+[ ] Implementação de autenticação JWT.
 
 Desenvolvido por Damilo Queiroz - [LinkedIn](https://www.linkedin.com/in/damiloqueiroz/)

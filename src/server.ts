@@ -187,17 +187,29 @@ app.get('/users/:userId/tasks', async (req, res) => {
     try {
       const { userId } = req.params
 
-      const userTasks = await prisma.task.findMany({
-        where: {
-          userId: userId
-        },
+      const page = Number(req.query.page) || 1;
+      const limit = Number(req.query.limit) || 10;
+      const skip = (page - 1) * limit;
 
-        orderBy: {
-          createdAt: 'desc'
-        }
+      const userTasks = await prisma.task.findMany({
+        where: { userId: userId },
+        orderBy: { createdAt: 'desc' },
+        take: limit,
+        skip: skip
       });
 
-      res.status(200).json({ status: 'success', data: userTasks});
+      const totalTasks = await prisma.task.count({ where: { userId: userId } });
+      const totalPages = Math.ceil(totalTasks / limit );
+
+      res.status(200).json({ 
+        status: 'success', 
+        meta: {
+          totalItems: totalTasks,
+          currentPage: page,
+          itemsPerPage: limit,
+          totalPages: totalPages
+        },
+        data: userTasks});
 
     } catch (error) {
       console.error('[DB_ERROR] Error fetching user tasks:', error)
