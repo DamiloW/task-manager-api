@@ -2,6 +2,8 @@ import express from 'express';
 import prisma from './config/database.js';
 import { createUserSchema, updateUserSchema } from './validations/user.schema.js';
 import { createTaskSchema, updateTaskSchema } from './validations/task.schema.js';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken'
 
 export const app = express();
 const PORT = 3000;
@@ -59,8 +61,13 @@ app.post('/users', async (req, res) => {
       });
     }
 
+    const hashedPassword = await bcrypt.hash(validation.data.password, 10);
+
     const newUser = await prisma.user.create({
-      data: validation.data
+      data: {
+        ...validation.data,
+        password: hashedPassword
+      }
     });
 
     res.status(201).json({
@@ -74,6 +81,36 @@ app.post('/users', async (req, res) => {
       status: 'error',
       message: 'Internal server error.'
     });
+  }
+})
+
+// --- ROTA DE LOGIN (POST) ---
+
+app.post('/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (!user) {
+      return res.status(401).json({ status: 'error', message: 'E-mail ou senha inválidos.' });
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return res.status(401).json({ status: 'error', message: 'E-mail ou senha inválidos.'});
+    }
+
+    const token = jwt.sign(
+      { userId: user.id },
+      process.env.JWT_SECRET || 'minha_chave_super_secreta_123',
+      { expiresIn: '1h' }
+    );
+
+    res.status(200).json({ status: 'success', token });
+
+  } catch (error) {
+    console.error('[DB_ERROR] Error logging in:', error)
+    res.status(500).json({ status: 'error', message: 'Erro interno ao fazer login.' })
   }
 })
 
