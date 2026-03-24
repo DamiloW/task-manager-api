@@ -3,7 +3,7 @@ import prisma from './config/database.js';
 import { createUserSchema, updateUserSchema } from './validations/user.schema.js';
 import { createTaskSchema, updateTaskSchema } from './validations/task.schema.js';
 
-const app = express();
+export const app = express();
 const PORT = 3000;
 
 // --- MIDDLEWARES ---
@@ -262,6 +262,8 @@ app.delete('/tasks/:id', async (req, res) => {
 
 // --- SERVER INITIALIZATION ---
 
-app.listen(PORT, () => {
-  console.log(`🚀 Server is running on http://localhost:${PORT}`);
-});
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(PORT, () => {
+    console.log(`🚀 Server is running on http://localhost:${PORT}`);
+  });
+}
