@@ -4,6 +4,7 @@ import { createUserSchema, updateUserSchema } from './validations/user.schema.js
 import { createTaskSchema, updateTaskSchema } from './validations/task.schema.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken'
+import { authMiddleware, type AuthRequest } from './middlewares/auth.middleware.js';
 
 export const app = express();
 const PORT = 3000;
@@ -182,7 +183,7 @@ app.put('/users/:id', async (req, res) => {
 
 // --- TASKS ROUTES ---
 
-app.post('/tasks', async (req, res) => {
+app.post('/tasks', authMiddleware, async (req: AuthRequest, res) => {
   const validation = createTaskSchema.safeParse(req.body);
 
   if(!validation.success) {
