@@ -19,7 +19,7 @@ export const authMiddleware = (req: AuthRequest, res: Response, next: NextFuncti
     }
 
     try {
-        const secret = process.env.JWT_SECRET || 'minha_chave_super_secreta_123';
+        const secret = process.env.JWT_SECRET || 'my_super_secret_key_123';
         const decoded = jwt.verify(token, secret) as unknown as { userId: string };
         req.userId = decoded.userId
         return next();
