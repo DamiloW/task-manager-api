@@ -1,11 +1,23 @@
 import 'dotenv/config';
 import { PrismaClient } from '@prisma/client';
 
+// We add the prisma instance to the Node.js global object
+// This ensures type safety for the globalThis.prisma variable
+declare global {
+  var prismaGlobal: PrismaClient | undefined;
+}
+
 /**
- * Instância global do Prisma Client.
- * Mantemos uma única instância para reaproveitar o pool de conexões do PostgreSQL
- * e evitar o erro de 'Too many clients' em ambiente de desenvolvimento.
+ * Global Prisma Client instance.
+ * We implement the Singleton pattern using globalThis to reuse the PostgreSQL 
+ * connection pool and prevent "Too many clients" errors during dev hot-reloading.
  */
-const prisma = new PrismaClient();
+const prisma = globalThis.prismaGlobal ?? new PrismaClient();
+
+// In development, we attach the instance to the global object so it survives hot reloads.
+// In production, we don't need this because the server doesn't hot reload.
+if (process.env.NODE_ENV !== 'production') {
+  globalThis.prismaGlobal = prisma;
+}
 
 export default prisma;

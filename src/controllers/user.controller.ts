@@ -2,7 +2,9 @@ import type { Request, Response } from 'express';
 import { createUserSchema, updateUserSchema } from '../validations/user.schema.js';
 import * as userService from '../services/user.service.js';
 
-// --- CREATE USER ---
+/**
+ * Creates a new user in the database.
+ */
 export const createUser = async (req: Request, res: Response) => {
   const validation = createUserSchema.safeParse(req.body);
 
@@ -11,7 +13,7 @@ export const createUser = async (req: Request, res: Response) => {
       status: 'error',
       message: 'Invalid data. Please check the provided information.',
       errors: validation.error.issues.map(issue => ({
-        field: issue.path,
+        field: issue.path.join('.'),
         message: issue.message
       }))
     });
@@ -25,12 +27,14 @@ export const createUser = async (req: Request, res: Response) => {
     if (error.message === 'EMAIL_ALREADY_IN_USE') {
       return res.status(409).json({ status: 'error', message: 'This email is already in use.' });
     }
-    console.error('[DB_ERROR] Error creating user:', error);
+    console.error('[UserController] Error creating user:', error);
     return res.status(500).json({ status: 'error', message: 'Internal server error.' });
   }
 };
 
-// --- LOGIN USER ---
+/**
+ * Authenticates a user and returns a JWT token.
+ */
 export const loginUser = async (req: Request, res: Response) => {
   try {
     const token = await userService.loginUserService(req.body);
@@ -40,23 +44,27 @@ export const loginUser = async (req: Request, res: Response) => {
     if (error.message === 'INVALID_CREDENTIALS') {
       return res.status(401).json({ status: 'error', message: 'Invalid email or password.' });
     }
-    console.error('[DB_ERROR] Error logging in:', error);
+    console.error('[UserController] Error logging in:', error);
     return res.status(500).json({ status: 'error', message: 'Internal server error during login.' });
   }
 };
 
-// --- GET ALL USERS ---
+/**
+ * Retrieves a list of all users.
+ */
 export const getUsers = async (req: Request, res: Response) => {
   try {
     const users = await userService.getUsersService();
     return res.status(200).json({ status: 'success', data: users });
   } catch (error) {
-    console.error('[DB_ERROR] Error fetching users:', error);
+    console.error('[UserController] Error fetching users:', error);
     return res.status(500).json({ status: 'error', message: 'Error fetching users.' });
   }
 };
 
-// --- UPDATE USER ---
+/**
+ * Updates an existing user's information by ID.
+ */
 export const updateUser = async (req: Request, res: Response) => {
   const validation = updateUserSchema.safeParse(req.body);
 
@@ -64,36 +72,38 @@ export const updateUser = async (req: Request, res: Response) => {
     return res.status(400).json({
       status: 'error',
       message: 'Invalid data provided.',
-      errors: validation.error.issues.map(issue => ({ field: issue.path, message: issue.message }))
+      errors: validation.error.issues.map(issue => ({ field: issue.path.join('.'), message: issue.message }))
     });
   }
 
   try {
     const { id } = req.params;
-    const updatedUser = await userService.updateUserService(id, validation.data);
+    const updatedUser = await userService.updateUserService(id as string, validation.data);
     return res.status(200).json({ status: 'success', data: updatedUser });
 
   } catch (error: any) {
     if (error.message === 'USER_NOT_FOUND') {
       return res.status(404).json({ status: 'error', message: 'User not found.' });
     }
-    console.error('[DB_ERROR] Error updating user:', error);
+    console.error('[UserController] Error updating user:', error);
     return res.status(500).json({ status: 'error', message: 'Error updating user.' });
   }
 };
 
-// --- DELETE USER ---
+/**
+ * Deletes a user from the database by ID.
+ */
 export const deleteUser = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    await userService.deleteUserService(id);
+    await userService.deleteUserService(id as string);
     return res.status(200).json({ status: 'success', message: 'User deleted successfully.' });
 
   } catch (error: any) {
     if (error.message === 'USER_NOT_FOUND') {
       return res.status(404).json({ status: 'error', message: 'User not found.' });
     }
-    console.error('[DB_ERROR] Error deleting user:', error);
+    console.error('[UserController] Error deleting user:', error);
     return res.status(500).json({ status: 'error', message: 'Error deleting user.' });
   }
 };

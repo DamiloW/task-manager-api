@@ -1,4 +1,9 @@
+version: '3.8'
+
 services:
+  # ----------------------------------------
+  # Database Service (PostgreSQL)
+  # ----------------------------------------
   db:
     image: postgres:latest
     container_name: task_manager_db
@@ -10,7 +15,22 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql
+      # Maps database data to a named volume to prevent data loss when container stops
+      - postgres_data:/var/lib/postgresql/data
+
+  # ----------------------------------------
+  # Node.js API Service
+  # ----------------------------------------
+  app:
+    build: .
+    container_name: task_manager_api
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: "postgresql://admin:password123@db:5432/task_manager?schema=public"
+      JWT_SECRET: "my_super_secret_key_123" 
+    depends_on:
+      - db
 
 volumes:
   postgres_data:

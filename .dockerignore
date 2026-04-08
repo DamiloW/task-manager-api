@@ -1,0 +1,29 @@
+# Dependências e Builds locais
+node_modules/
+dist/
+
+# Variáveis de Ambiente
+.env
+.env.*
+
+# Logs
+*.log
+npm-debug.log*
+
+# Arquivos de Configuração do Git e Docs
+.git/
+.gitignore
+README.md
+
+# Arquivos do próprio Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Testes
+src/tests/
+vitest.config.ts
+
+# Arquivos de Sistema e Editor
+.DS_Store
+.vscode/

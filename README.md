@@ -1,58 +1,71 @@
 # Task Manager API
 
-Uma API robusta para gerenciamento de tarefas, desenvolvida com foco em boas práticas, escalabilidade e tipagem forte. Este projeto faz parte do meu portfólio de desenvolvimento FullStack.
+A robust RESTful API for task management, developed with a strong focus on best practices, scalability, and strict typing. This project is part of my Full-Stack development portfolio.
 
-## Tecnologias Utilizadas
+## 🚀 Technologies & Tools
 
 - **Runtime:** [Node.js](https://nodejs.org/)
 - **Framework:** [Express](https://expressjs.com/)
-- **Linguagem:** [TypeScript](https://www.typescriptlang.org/)
-- **Banco de Dados:** [PostgreSQL](https://www.postgresql.org/)
+- **Language:** [TypeScript](https://www.typescriptlang.org/)
+- **Database:** [PostgreSQL](https://www.postgresql.org/)
 - **ORM:** [Prisma](https://www.prisma.io/)
-- **Validação:** [Zod](https://zod.dev/)
-- **Containerização:** [Docker](https://www.docker.com/)
+- **Validation:** [Zod](https://zod.dev/)
+- **Authentication:** JWT (JSON Web Tokens)
+- **Testing:** [Vitest](https://vitest.dev/) & Supertest (E2E Tests)
+- **Documentation:** Swagger (OpenAPI)
+- **Containerization:** [Docker](https://www.docker.com/) & Docker Compose
 
-## Funcionalidades Implementadas
+## ✨ Key Features
 
-- **Usuários:** CRUD completo com senhas seguras e relacionamentos.
-- **Tarefas:** CRUD completo vinculado ao ID do usuário dono da tarefa.
-- **Paginação:** Sistema de paginação e meta-dados na listagem de tarefas.
-- **Segurança:** Validação estrita de dados de entrada utilizando schemas do Zod.
+- **Authentication & Authorization:** Secure login with JWT. Password hashing using bcrypt.
+- **User Management:** Complete CRUD operations for users.
+- **Task Management:** Complete CRUD operations for tasks. Tasks are strictly linked to the authenticated user.
+- **Pagination:** Built-in pagination and metadata for listing tasks.
+- **Data Validation:** Strict input validation and error handling using Zod schemas.
+- **Interactive Documentation:** Swagger UI integrated for easy API exploration and testing.
+- **Automated Testing:** End-to-End (E2E) testing suite ensuring API reliability.
 
-## Arquitetura do Projeto
+## 🏗️ Architecture
 
-A aplicação utiliza Docker para isolar o banco de dados e o Prisma como ponte entre o código e o PostgreSQL, garantindo migrações de dados consistentes e seguras.
+The application is fully containerized. It uses Docker Compose to orchestrate both the Node.js API and the PostgreSQL database seamlessly. Prisma acts as the bridge between the application and the database, ensuring consistent and safe data migrations.
 
-## Como Executar o Projeto
+## 🛠️ How to Run the Project
 
-### Pré-requisitos
-- Node.js instalado
-- Docker e Docker Compose instalados
+Since the application is fully Dockerized, getting it up and running is incredibly simple.
 
-### Passo a Passo
+### Prerequisites
+- [Docker](https://www.docker.com/) and Docker Compose installed on your machine.
 
-1. **Clonar o repositório:**
+### Step-by-Step
+
+1. **Clone the repository:**
    ```bash
    git clone [https://github.com/DamiloW/task-manager-api.git](https://github.com/DamiloW/task-manager-api.git)
    cd task-manager-api
 
-2. **Instalar as dependências:**
-    npm install
+2. **Set up environment variables:**
+Create a .env file in the root directory and add your secret keys (you can use .env.example if available):
+    DATABASE_URL="postgresql://admin:password123@db:5432/task_manager?schema=public"
+    JWT_SECRET="your_super_secret_jwt_key"
 
-3. **Subir o Banco de Dados (Docker):**
-    docker compose up -d
+3. **Build and start the containers:**
+    docker compose up --build
 
-4. **Rodar as Migrations do Prisma:**
-    npx prisma migrate dev
+4. **Access the API:**
+    Base URL: http://localhost:3000
+    Swagger Documentation: http://localhost:3000/api-docs
 
-5. **Iniciar o servidor de desenvolvimento:**
-    npm run dev
+5. **🧪 How to Run Tests**
+To run the automated E2E test suite locally (requires Node.js):
 
-Próximos Passos (Roadmap)
-[x] CRUD completo de usuários.
-[x] CRUD completo de tarefas com paginação.
-[ ] Implementação de Testes Automatizados com Jest.
-[ ] Documentação da API com Swagger.
-[ ] Implementação de autenticação JWT.
+**🗺️ Project Roadmap (Completed)**
 
-Desenvolvido por Damilo Queiroz - [LinkedIn](https://www.linkedin.com/in/damiloqueiroz/)
+[x] Complete User CRUD.
+[x] Complete Task CRUD with pagination.
+[x] Data validation with Zod.
+[x] JWT Authentication & Route protection.
+[x] Automated E2E Testing with Vitest.
+[x] Interactive API Documentation with Swagger.
+[x] Full Docker containerization (API + Database).
+
+Developed by Damilo Queiroz - [LinkedIn](https://www.linkedin.com/in/damiloqueiroz/)

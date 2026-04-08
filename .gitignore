@@ -1,4 +1,24 @@
-node_modules
-dist
-.env
+# Dependências
+node_modules/
+
+# Builds e Compilados
+dist/
 /src/generated/prisma
+
+# Variáveis de Ambiente (SEGURANÇA MÁXIMA)
+.env
+.env.*
+
+# Logs de Erro
+*.log
+npm-debug.log*
+
+# Arquivos de Sistema Operacional (Windows/Mac)
+.DS_Store
+Thumbs.db
+
+# Arquivos do Editor (VS Code)
+.vscode/
+
+# Relatórios de Testes
+coverage/
